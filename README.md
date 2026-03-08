@@ -4,7 +4,7 @@ A simple and effective web app to help students organize and track their homewor
 
 ## 🌍 Live Demo
 
-🔗 https://yourusername.github.io/your-repo-name/
+🔗 https://mr-danix.github.io/H.W-tracker/
 
 ## ✨ Features
 
