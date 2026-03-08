@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Student Homework & Task Tracker - Stay organized, track deadlines, and never miss an assignment again.">
+    <title>Student Homework Tracker</title>
+    
+   
+
+    <style>
+        :root {
+            --bg-primary: #faf8f5;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --text-muted: #a0aec0;
+            --accent-primary: #e07850;
+            --accent-danger: #f56565;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(0, 0, 0, 0.08);
+            --shadow-hover: rgba(0, 0, 0, 0.12);
+            --subject-math: #4299e1;
+            --subject-science: #48bb78;
+            --subject-english: #9f7aea;
+            --subject-history: #ed8936;
+            --subject-art: #ed64a6;
+            --subject-other: #718096;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.3s ease;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1a202c;
+            --bg-secondary: #2d3748;
+            --bg-card: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #cbd5e0;
+            --text-muted: #718096;
+            --border-color: #4a5568;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --shadow-hover: rgba(0, 0, 0, 0.4);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color var(--transition-normal), color var(--transition-normal);
+        }
+
+        .container { max-width: 700px; margin: 0 auto; padding: 20px; }
+
+        header { text-align: center; padding: 40px 20px; position: relative; }
+
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--accent-primary), #f6ad55);
+            border-radius: var(--radius-lg);
+            margin-bottom: 16px;
+            font-size: 32px;
+            box-shadow: 0 8px 30px rgba(224, 120, 80, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+        .subtitle { color: var(--text-secondary); font-size: 1.1rem; }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: all var(--transition-normal);
+        }
+
+        .theme-toggle:hover { transform: scale(1.1) rotate(15deg); }
+
+        .stats-bar { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 24px; }
+        @media (min-width: 500px) { .stats-bar { grid-template-columns: repeat(4, 1fr); } }
+
+        .stat-card {
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: all var(--transition-normal);
+            animation: slideUp 0.5s ease forwards;
+            opacity: 0;
+        }
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        .stat-card:hover { transform: translateY(-3px); }
+
+        .stat-number { font-size: 1.8rem; font-weight: 700; color: var(--accent-primary); }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+
+        .add-task-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 4px 20px var(--shadow-color);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .add-task-toggle {
+            width: 100%;
+            padding: 20px;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+        .add-task-toggle:hover { background: var(--bg-primary); }
+
+        .add-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-primary), #f6ad55);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            transition: transform var(--transition-normal);
+        }
+        .add-task-toggle:hover .add-icon { transform: scale(1.1); }
+
+        .toggle-text { text-align: left; }
+        .toggle-text h3 { color: var(--text-primary); font-size: 1rem; font-weight: 600; }
+        .toggle-text p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .task-form { padding: 0 20px 20px; display: none; animation: slideDown 0.3s ease; }
+        .task-form.active { display: block; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+        .form-header h3 { display: flex; align-items: center; gap: 8px; color: var(--text-primary); }
+
+        .close-form {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color var(--transition-fast);
+        }
+        .close-form:hover { color: var(--text-primary); }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-secondary); font-size: 0.9rem; }
+
+        .subject-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        @media (min-width: 500px) { .subject-grid { grid-template-columns: repeat(6, 1fr); } }
+
+        .subject-btn {
+            padding: 12px 8px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-primary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-align: center;
+        }
+        .subject-btn:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
+        .subject-btn.selected { border-color: var(--accent-primary); background: var(--accent-primary); color: white; }
+        .subject-btn .emoji { display: block; font-size: 20px; margin-bottom: 4px; }
+        .subject-btn .name { font-size: 0.75rem; font-weight: 500; }
+
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all var(--transition-fast);
+        }
+        input:focus, textarea:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(224, 120, 80, 0.2); }
+        textarea { resize: vertical; min-height: 100px; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--accent-primary), #f6ad55);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all var(--transition-normal);
+            box-shadow: 0 4px 15px rgba(224, 120, 80, 0.3);
+        }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(224, 120, 80, 0.4); }
+
+        .task-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .task-list-header h2 { font-size: 1.2rem; }
+        .task-count { color: var(--text-muted); font-size: 0.9rem; }
+
+        .empty-state { text-align: center; padding: 60px 20px; animation: fadeIn 0.5s ease; }
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+        .empty-state h3 { color: var(--text-primary); margin-bottom: 8px; }
+        .empty-state p { color: var(--text-muted); }
+
+        .task-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: all var(--transition-normal);
+            animation: slideUp 0.4s ease forwards;
+            opacity: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .task-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px var(--shadow-hover); }
+        .task-card.today { border-left: 4px solid var(--accent-primary); }
+        .task-card.today::before {
+            content: 'TODAY';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: linear-gradient(135deg, var(--accent-primary), #f6ad55);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 0 var(--radius-lg) 0 var(--radius-sm);
+        }
+        .task-card.completed { opacity: 0.6; }
+        .task-card.completed .task-description { text-decoration: line-through; color: var(--text-muted); }
+        .task-card.deleting { animation: slideOut 0.3s ease forwards; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideOut { to { opacity: 0; transform: translateX(-100%); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .task-top { display: flex; gap: 16px; align-items: flex-start; }
+
+        .task-checkbox {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all var(--transition-fast);
+            background: var(--bg-primary);
+        }
+        .task-checkbox:hover { border-color: var(--accent-primary); background: rgba(224, 120, 80, 0.1); }
+        .task-checkbox.checked { background: var(--accent-primary); border-color: var(--accent-primary); }
+        .task-checkbox.checked::after { content: '✓'; color: white; font-weight: bold; animation: checkPop 0.3s ease; }
+
+        @keyframes checkPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .task-content { flex: 1; min-width: 0; }
+
+        .subject-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+        }
+        .subject-badge.math { background: var(--subject-math); }
+        .subject-badge.science { background: var(--subject-science); }
+        .subject-badge.english { background: var(--subject-english); }
+        .subject-badge.history { background: var(--subject-history); }
+        .subject-badge.art { background: var(--subject-art); }
+        .subject-badge.other { background: var(--subject-other); }
+
+        .task-description { color: var(--text-primary); font-weight: 500; margin-bottom: 12px; line-height: 1.5; transition: all var(--transition-normal); }
+
+        .due-info { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .days-remaining { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; font-weight: 500; }
+        .days-remaining.urgent { color: var(--accent-danger); }
+        .days-remaining.soon { color: var(--accent-primary); }
+        .days-remaining.normal { color: var(--text-muted); }
+        .due-date { color: var(--text-muted); font-size: 0.85rem; }
+
+        .delete-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all var(--transition-fast);
+            opacity: 0;
+            flex-shrink: 0;
+        }
+        .task-card:hover .delete-btn { opacity: 1; }
+        .delete-btn:hover { background: rgba(245, 101, 101, 0.1); color: var(--accent-danger); }
+
+        footer { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.9rem; }
+        footer a { color: var(--accent-primary); text-decoration: none; }
+
+        @media (max-width: 500px) {
+            h1 { font-size: 1.6rem; }
+            .theme-toggle { width: 44px; height: 44px; top: 10px; right: 10px; }
+            header { padding: 30px 15px; }
+            .container { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <button class="theme-toggle" id="themeToggle">🌙</button>
+        <div class="logo">🎓</div>
+        <h1>Homework Tracker</h1>
+        <p class="subtitle" id="currentDate"></p>
+    </header>
+
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-number" id="statTotal">0</div>
+                <div class="stat-label">Total Tasks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statPending">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statToday">0</div>
+                <div class="stat-label">Due Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statCompleted">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+
+        <div class="add-task-section">
+            <button class="add-task-toggle" id="addTaskToggle">
+                <div class="add-icon">+</div>
+                <div class="toggle-text">
+                    <h3>Add New Homework</h3>
+                    <p>Click to add a new task</p>
+                </div>
+            </button>
+            <form class="task-form" id="taskForm">
+                <div class="form-header">
+                    <h3>📝 New Homework</h3>
+                    <button type="button" class="close-form" id="closeForm">×</button>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <div class="subject-grid" id="subjectGrid">
+                        <button type="button" class="subject-btn selected" data-subject="math"><span class="emoji">📐</span><span class="name">Math</span></button>
+                        <button type="button" class="subject-btn" data-subject="science"><span class="emoji">🔬</span><span class="name">Science</span></button>
+                        <button type="button" class="subject-btn" data-subject="english"><span class="emoji">📚</span><span class="name">English</span></button>
+                        <button type="button" class="subject-btn" data-subject="history"><span class="emoji">🏛️</span><span class="name">History</span></button>
+                        <button type="button" class="subject-btn" data-subject="art"><span class="emoji">🎨</span><span class="name">Art</span></button>
+                        <button type="button" class="subject-btn" data-subject="other"><span class="emoji">📝</span><span class="name">Other</span></button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="taskDescription">Task Description</label>
+                    <textarea id="taskDescription" placeholder="What do you need to complete?" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="dueDate">Due Date</label>
+                    <input type="date" id="dueDate" required>
+                </div>
+                <button type="submit" class="submit-btn"><span>+</span> Add Homework</button>
+            </form>
+        </div>
+
+        <div class="task-list-section">
+            <div class="task-list-header">
+                <h2>Your Homework</h2>
+                <span class="task-count" id="taskCount">0 remaining</span>
+            </div>
+            <div id="taskList"></div>
+        </div>
+    </div>
+
+    <footer><p>Made with ❤️ for Students</p></footer>
+
+    <script>
+        const themeToggle=document.getElementById('themeToggle'),addTaskToggle=document.getElementById('addTaskToggle'),taskForm=document.getElementById('taskForm'),closeForm=document.getElementById('closeForm'),subjectGrid=document.getElementById('subjectGrid'),taskDescription=document.getElementById('taskDescription'),dueDate=document.getElementById('dueDate'),taskList=document.getElementById('taskList'),currentDateEl=document.getElementById('currentDate'),statTotal=document.getElementById('statTotal'),statPending=document.getElementById('statPending'),statToday=document.getElementById('statToday'),statCompleted=document.getElementById('statCompleted'),taskCount=document.getElementById('taskCount');let tasks=[],selectedSubject='math',isDarkMode=false;const subjects={math:{emoji:'📐',name:'Math'},science:{emoji:'🔬',name:'Science'},english:{emoji:'📚',name:'English'},history:{emoji:'🏛️',name:'History'},art:{emoji:'🎨',name:'Art'},other:{emoji:'📝',name:'Other'}};function init(){loadFromLocalStorage();loadTheme();setCurrentDate();setMinDate();renderTasks();updateStats();setupEventListeners()}function loadFromLocalStorage(){const stored=localStorage.getItem('homework-tasks');if(stored){try{tasks=JSON.parse(stored)}catch(e){tasks=[]}}}function saveToLocalStorage(){localStorage.setItem('homework-tasks',JSON.stringify(tasks))}function loadTheme(){const savedTheme=localStorage.getItem('homework-theme');if(savedTheme==='dark'){isDarkMode=true;document.documentElement.setAttribute('data-theme','dark');themeToggle.textContent='☀️'}}function toggleTheme(){isDarkMode=!isDarkMode;if(isDarkMode){document.documentElement.setAttribute('data-theme','dark');themeToggle.textContent='☀️';localStorage.setItem('homework-theme','dark')}else{document.documentElement.removeAttribute('data-theme');themeToggle.textContent='🌙';localStorage.setItem('homework-theme','light')}}function setCurrentDate(){const options={weekday:'long',month:'long',day:'numeric'};currentDateEl.textContent=new Date().toLocaleDateString('en-US',options)}function setMinDate(){const today=new Date().toISOString().split('T')[0];dueDate.value=today;dueDate.min=today}function getDaysRemaining(dueDateStr){const today=new Date();today.setHours(0,0,0,0);const due=new Date(dueDateStr);due.setHours(0,0,0,0);return Math.ceil((due.getTime()-today.getTime())/(1000*60*60*24))}function isToday(dueDateStr){return new Date().toDateString()===new Date(dueDateStr).toDateString()}function formatDate(dueDateStr){return new Date(dueDateStr).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})}function getDaysLabel(days){if(days<0){const absDays=Math.abs(days);return{text:`${absDays} day${absDays!==1?'s':''} overdue`,icon:'⚠️',class:'urgent'}}if(days===0)return{text:'Due today',icon:'🔥',class:'urgent'};if(days===1)return{text:'Due tomorrow',icon:'⏰',class:'soon'};if(days<=3)return{text:`${days} days left`,icon:'⏰',class:'soon'};return{text:`${days} days left`,icon:'📅',class:'normal'}}function generateId(){return'task-'+Date.now()+'-'+Math.random().toString(36).substr(2,9)}function addTask(subject,description,dueDateValue){tasks.unshift({id:generateId(),subject,description,dueDate:dueDateValue,completed:false,createdAt:new Date().toISOString()});saveToLocalStorage();renderTasks();updateStats()}function toggleComplete(id){const task=tasks.find(t=>t.id===id);if(task){task.completed=!task.completed;saveToLocalStorage();renderTasks();updateStats()}}function deleteTask(id){const card=document.querySelector(`[data-id="${id}"]`);if(card){card.classList.add('deleting');setTimeout(()=>{tasks=tasks.filter(t=>t.id!==id);saveToLocalStorage();renderTasks();updateStats()},300)}}function escapeHtml(text){const div=document.createElement('div');div.textContent=text;return div.innerHTML}function renderTasks(){const sortedTasks=[...tasks].sort((a,b)=>{if(a.completed!==b.completed)return a.completed?1:-1;return new Date(a.dueDate).getTime()-new Date(b.dueDate).getTime()});if(sortedTasks.length===0){taskList.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><h3>No homework yet!</h3><p>Add your first task using the form above</p></div>`;return}taskList.innerHTML=sortedTasks.map((task,index)=>{const days=getDaysRemaining(task.dueDate);const daysInfo=getDaysLabel(days);const todayClass=isToday(task.dueDate)&&!task.completed?'today':'';const completedClass=task.completed?'completed':'';const subject=subjects[task.subject]||subjects.other;return`<div class="task-card ${todayClass} ${completedClass}" data-id="${task.id}" style="animation-delay:${index*0.05}s"><div class="task-top"><div class="task-checkbox ${task.completed?'checked':''}" onclick="toggleComplete('${task.id}')"></div><div class="task-content"><span class="subject-badge ${task.subject}">${subject.emoji} ${subject.name}</span><p class="task-description">${escapeHtml(task.description)}</p><div class="due-info"><span class="days-remaining ${daysInfo.class}">${daysInfo.icon} ${daysInfo.text}</span><span class="due-date">• ${formatDate(task.dueDate)}</span></div></div><button class="delete-btn" onclick="deleteTask('${task.id}')">🗑️</button></div></div>`}).join('')}function updateStats(){const total=tasks.length,completed=tasks.filter(t=>t.completed).length,pending=total-completed,dueToday=tasks.filter(t=>isToday(t.dueDate)&&!t.completed).length;statTotal.textContent=total;statPending.textContent=pending;statToday.textContent=dueToday;statCompleted.textContent=completed;taskCount.textContent=`${pending} remaining`}function setupEventListeners(){themeToggle.addEventListener('click',toggleTheme);addTaskToggle.addEventListener('click',()=>{taskForm.classList.add('active');addTaskToggle.style.display='none'});closeForm.addEventListener('click',()=>{taskForm.classList.remove('active');addTaskToggle.style.display='flex'});subjectGrid.addEventListener('click',e=>{const btn=e.target.closest('.subject-btn');if(btn){document.querySelectorAll('.subject-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');selectedSubject=btn.dataset.subject}});taskForm.addEventListener('submit',e=>{e.preventDefault();const description=taskDescription.value.trim();const dueDateValue=dueDate.value;if(description&&dueDateValue){addTask(selectedSubject,description,dueDateValue);taskDescription.value='';setMinDate();taskForm.classList.remove('active');addTaskToggle.style.display='flex'}})}window.toggleComplete=toggleComplete;window.deleteTask=deleteTask;document.addEventListener('DOMContentLoaded',init);
+    </script>
+</body>
+</html>
