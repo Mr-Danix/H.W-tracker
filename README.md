@@ -2,7 +2,7 @@
 
 A simple and effective web app to help students organize and track their homework. Stay productive by managing assignments, deadlines, and completed tasks in one place.
 
-## 🌍 Live Demo
+## 🌍 Live Demo 
 
 🔗 https://mr-danix.github.io/H.W-tracker/
 
